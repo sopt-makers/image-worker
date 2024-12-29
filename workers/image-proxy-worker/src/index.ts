@@ -43,7 +43,7 @@ export default {
 
 			response = new Response(resizedImage, {
 				headers: {
-					'Content-Type': 'image/png',
+					'Content-Type': 'image/webp',
 				},
 			});
 

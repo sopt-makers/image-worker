@@ -9,6 +9,10 @@ importers:
   .: {}
 
   workers/image-proxy-worker:
+    dependencies:
+      '@cf-wasm/photon':
+        specifier: ^0.1.29
+        version: 0.1.29
     devDependencies:
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.5.2
@@ -45,6 +49,12 @@ importers:
         version: 3.99.0(@cloudflare/workers-types@4.20241224.0)
 
 packages:
+
+  '@cf-wasm/internals@0.0.3':
+    resolution: {integrity: sha512-v6PmiQnJIrVvL2IdPg5aCqARSKw/U1JvFsms2cCt3Szx3/3EvtVVhN9MALCh6kZ2CV2fvzs3tmiYezRQ6JyqcQ==}
+
+  '@cf-wasm/photon@0.1.29':
+    resolution: {integrity: sha512-dqKRSfcqOQpVATTdMrnGjrf0iUH/Yv5woYn81o2nBv2xwSmB91MsnY1b83Bt24vC/oxVqbvio9JQByXT/Ry1lw==}
 
   '@cloudflare/kv-asset-handler@0.3.4':
     resolution: {integrity: sha512-YLPHc8yASwjNkmcDMQMY35yiWjoKAKnhUbPRszBRS0YgH+IXtsMp61j+yTcnCE3oO2DgP0U3iejLC8FTtKDC8Q==}
@@ -918,6 +928,12 @@ packages:
     resolution: {integrity: sha512-muH7gBL9sI1nciMZV67X5fTKKBLtwpZ5VBp1vsOQzj1MhrBZ4wlVCm3gedKZWLp0Oyel8sIGfeiz54Su+OVT+A==}
 
 snapshots:
+
+  '@cf-wasm/internals@0.0.3': {}
+
+  '@cf-wasm/photon@0.1.29':
+    dependencies:
+      '@cf-wasm/internals': 0.0.3
 
   '@cloudflare/kv-asset-handler@0.3.4':
     dependencies:
