@@ -13,6 +13,42 @@
 
 export default {
 	async fetch(request, env, ctx): Promise<Response> {
-		return new Response('Hello World!~~~');
+		const url = new URL(request.url);
+
+		const width = url.searchParams.get('width');
+		const imageUrl = url.searchParams.get('url');
+
+		if (imageUrl == null) {
+			return new Response('에러에러 url 이 널', { status: 400 });
+		}
+
+		if (width == null) {
+			return new Response('에러에러 width가 널', { status: 400 });
+		}
+
+		//cache
+		const cacheKey = new Request(url.toString());
+		const cache = caches.default;
+
+		let response = await cache.match(cacheKey);
+
+		if (response == null) {
+			console.log(`Response for request url: ${request.url} not present in cache. Fetching and caching request.`);
+			const imageData = await fetch(imageUrl);
+
+			response = new Response(imageData.body, {
+				headers: {
+					'Content-Type': 'image/png',
+				},
+			});
+
+			response.headers.append('Cache-Control', 'public, s-maxage=10');
+
+			ctx.waitUntil(cache.put(cacheKey, response.clone()));
+		} else {
+			console.log(`Cache hit for: ${request.url}.`);
+		}
+
+		return response;
 	},
 } satisfies ExportedHandler<Env>;
