@@ -11,6 +11,8 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
+import { resizeImage } from './resizer';
+
 export default {
 	async fetch(request, env, ctx): Promise<Response> {
 		const url = new URL(request.url);
@@ -34,9 +36,12 @@ export default {
 
 		if (response == null) {
 			console.log(`Response for request url: ${request.url} not present in cache. Fetching and caching request.`);
+
 			const imageData = await fetch(imageUrl);
 
-			response = new Response(imageData.body, {
+			const resizedImage = await resizeImage(await imageData.arrayBuffer());
+
+			response = new Response(resizedImage, {
 				headers: {
 					'Content-Type': 'image/png',
 				},
