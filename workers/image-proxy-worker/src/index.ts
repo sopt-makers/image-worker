@@ -72,7 +72,7 @@ export default {
 				},
 			});
 
-			response.headers.append('Cache-Control', 'public, s-maxage=900');
+			response.headers.append('Cache-Control', 'public, s-maxage=900, max-age=31536000');
 
 			ctx.waitUntil(cache.put(cacheKey, response.clone()));
 		} else {
