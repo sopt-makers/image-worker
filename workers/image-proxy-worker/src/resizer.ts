@@ -10,12 +10,17 @@ export const resizeImage = async (imageData: ArrayBuffer, targetWidth: number) =
 	// imageWidth : imageHeight = targetWidth : targetHeight
 	const targetHeight = (imageHeight * targetWidth) / imageWidth;
 
-	const outputImage = resize(inputImage, targetWidth, targetHeight, SamplingFilter.Nearest);
+	try {
+		const outputImage = resize(inputImage, targetWidth, targetHeight, SamplingFilter.Nearest);
 
-	const outputBytes = outputImage.get_bytes_webp();
+		const outputBytes = outputImage.get_bytes_webp();
 
-	inputImage.free();
-	outputImage.free();
+		inputImage.free();
+		outputImage.free();
 
-	return outputBytes;
+		return outputBytes;
+	} catch {
+		//photon 에서 에러 발생 시 원본 이미지 반환
+		return imageData;
+	}
 };
