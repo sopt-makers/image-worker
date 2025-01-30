@@ -60,19 +60,15 @@ export default {
 		let response = await cache.match(cacheKey);
 
 		if (response == null) {
-			console.log(`Cache Miss2: width=${width}, url=${url}`);
+			console.log(`Cache Miss: width=${width}, url=${url}`);
 
 			const unResizedImage = await fetch(imageUrl);
 
-			console.log(`unResizedImage : ${unResizedImage}`)
-
 			const resizedImage = await resizeImage(await unResizedImage.arrayBuffer(), width);
-
-			console.log(`resizedImage : ${resizedImage}`)
 
 			response = new Response(resizedImage, {
 				headers: {
-					'Content-Type': 'image/png',
+					'Content-Type': 'image/webp',
 				},
 			});
 
@@ -80,7 +76,7 @@ export default {
 
 			ctx.waitUntil(cache.put(cacheKey, response.clone()));
 		} else {
-			console.log(`Cache Hit2: width=${width}, url=${url}`);
+			console.log(`Cache Hit: width=${width}, url=${url}`);
 		}
 
 		return response;

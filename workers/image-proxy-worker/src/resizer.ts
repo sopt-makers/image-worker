@@ -2,24 +2,21 @@ export const resizeImage = async (imageData: ArrayBuffer, targetWidth: number) =
 	const { PhotonImage, resize, SamplingFilter } = await import('@cf-wasm/photon');
 
 	const inputBytes = new Uint8Array(imageData);
-	console.log(`imageData: ${imageData}`);
-	console.log(`inputBytes: ${inputBytes}`);
-	if (inputBytes) {
-		const inputImage = PhotonImage.new_from_byteslice(inputBytes);
 
-		const imageWidth = inputImage.get_width();
-		const imageHeight = inputImage.get_height();
+	const inputImage = PhotonImage.new_from_byteslice(inputBytes);
 
-		// imageWidth : imageHeight = targetWidth : targetHeight
-		const targetHeight = (imageHeight * targetWidth) / imageWidth;
+	const imageWidth = inputImage.get_width();
+	const imageHeight = inputImage.get_height();
 
-		const outputImage = resize(inputImage, targetWidth, targetHeight, SamplingFilter.Nearest);
+	// imageWidth : imageHeight = targetWidth : targetHeight
+	const targetHeight = (imageHeight * targetWidth) / imageWidth;
 
-		const outputBytes = outputImage.get_bytes_webp();
+	const outputImage = resize(inputImage, targetWidth, targetHeight, SamplingFilter.Nearest);
 
-		inputImage.free();
-		outputImage.free();
+	const outputBytes = outputImage.get_bytes_webp();
 
-		return outputBytes;
-	}
+	inputImage.free();
+	outputImage.free();
+
+	return outputBytes;
 };
