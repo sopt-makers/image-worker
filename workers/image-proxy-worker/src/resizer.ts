@@ -20,6 +20,6 @@ export const resizeImage = async (imageData: ArrayBuffer, targetWidth: number) =
 
 		return outputBytes;
 	} catch (e) {
-		console.log(e);
+		return imageData;
 	}
 };
