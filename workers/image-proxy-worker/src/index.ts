@@ -37,10 +37,10 @@ export default {
 
 		const isAllowed = whiteListUrl.some((allowedUrl) => imageUrl?.startsWith(allowedUrl));
 
-		// if (!isAllowed) {
-		// 	console.log('허용되지 않은 이미지 url 입니다.')
-		// 	// return new Response('허용되지 않은 이미지 url 입니다.', { status: 403 });
-		// }
+		if (!isAllowed) {
+			console.log('허용되지 않은 이미지 url 입니다.')
+			return new Response('허용되지 않은 이미지 url 입니다.', { status: 403 });
+		}
 		//원본 이미지
 		const unResizedImage = await fetch(imageUrl);
 
