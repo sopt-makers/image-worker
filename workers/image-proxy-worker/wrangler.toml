@@ -7,6 +7,10 @@ compatibility_flags = ["nodejs_compat"]
 [limits]
 cpu_ms = 1000
 
+[[kv_namespaces]]
+binding = "IMAGE_CACHE"
+id = "98c27add2d2b4a3f9b3fd1e93b190116"
+
 # Workers Logs
 # Docs: https://developers.cloudflare.com/workers/observability/logs/workers-logs/
 # Configuration: https://developers.cloudflare.com/workers/observability/logs/workers-logs/#enable-workers-logs

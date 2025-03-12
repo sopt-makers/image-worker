@@ -19,7 +19,6 @@ export default {
 
 		const widthStr = url.searchParams.get('width');
 		const imageUrl = url.searchParams.get('url');
-		const isOriginal = url.searchParams.get('isOriginal') === 'true';
 
 		if (imageUrl == null) {
 			return new Response('이미지 url 이 없습니다.', { status: 400 });
@@ -38,15 +37,11 @@ export default {
 		const isAllowed = whiteListUrl.some((allowedUrl) => imageUrl?.startsWith(allowedUrl));
 
 		if (!isAllowed) {
-			console.log('허용되지 않은 이미지 url 입니다.')
+			console.log('허용되지 않은 이미지 url 입니다.');
 			return new Response('허용되지 않은 이미지 url 입니다.', { status: 403 });
 		}
 		//원본 이미지
 		const unResizedImage = await fetch(imageUrl);
-
-		if (isOriginal) {
-			return unResizedImage;
-		}
 
 		const width = Number(widthStr);
 
@@ -54,32 +49,63 @@ export default {
 			return unResizedImage;
 		}
 
-		// 캐싱
-		const cacheKey = new Request(url.toString());
-		const cache = caches.default;
+		//KV
+		const value = await env.IMAGE_CACHE.get(url.toString(), { type: 'stream' });
 
-		let response = await cache.match(cacheKey);
-
-		if (response == null) {
-			console.log(`Cache Miss: width=${width}, url=${url}`);
-
+		if (value == null) {
 			const unResizedImage = await fetch(imageUrl);
 
-			const resizedImage = await resizeImage(await unResizedImage.arrayBuffer(), width);
+			const resizedImage = await resizeImage(await unResizedImage.arrayBuffer(), width, imageUrl);
 
-			response = new Response(resizedImage, {
+			let response = new Response(resizedImage, {
 				headers: {
 					'Content-Type': 'image/webp',
 				},
 			});
 
-			response.headers.append('Cache-Control', 'public, s-maxage=10, max-age=10');
-
-			ctx.waitUntil(cache.put(cacheKey, response.clone()));
+			response.headers.append('Cache-Control', 'public, s-maxage=10000, max-age=10000');
+			if (resizedImage) {
+				ctx.waitUntil(env.IMAGE_CACHE.put(url.toString(), resizedImage, { expirationTtl: 604800 }));
+			}
+			return response;
 		} else {
-			console.log(`Cache Hit: width=${width}, url=${url}`);
+			let response = new Response(value, {
+				headers: {
+					'Content-Type': 'image/webp',
+				},
+			});
+
+			response.headers.append('Cache-Control', 'public, s-maxage=10000, max-age=10000');
+
+			return response;
 		}
 
-		return response;
+		// 캐싱
+		// const cacheKey = new Request(url.toString());
+		// const cache = caches.default;
+
+		// let response = await cache.match(cacheKey);
+
+		// if (response == null) {
+		// 	console.log(`Cache Miss: width=${width}, url=${url}`);
+
+		// 	const unResizedImage = await fetch(imageUrl);
+
+		// 	const resizedImage = await resizeImage(await unResizedImage.arrayBuffer(), width);
+
+		// 	response = new Response(resizedImage, {
+		// 		headers: {
+		// 			'Content-Type': 'image/webp',
+		// 		},
+		// 	});
+
+		// 	response.headers.append('Cache-Control', 'public, s-maxage=1000, max-age=1000');
+
+		// 	ctx.waitUntil(cache.put(cacheKey, response.clone()));
+		// } else {
+		// 	console.log(`Cache Hit: width=${width}, url=${url}`);
+		// }
+
+		// return response;
 	},
 } satisfies ExportedHandler<Env>;
